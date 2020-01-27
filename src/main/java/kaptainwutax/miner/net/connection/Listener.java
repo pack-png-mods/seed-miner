@@ -34,10 +34,11 @@ public class Listener extends Thread {
     private ServerListener serverListener;
 
     private List<Consumer<Listener>> connectionEstablishedConsumers = new ArrayList<>();
+    private List<Consumer<Listener>> connectionLostConsumers = new ArrayList<>();
     private List<Consumer<Context>> contextCreatedConsumers = new ArrayList<>();
 
     public Listener(Socket socket) {
-        this.setName("[iBuilders] Listener " + this.getListenerId());
+        this.setName("Listener " + this.getListenerId());
         this.connectionAddress = new NetAddress(socket.getInetAddress().getHostAddress(), socket.getPort());
 
         try {
@@ -111,6 +112,10 @@ public class Listener extends Thread {
         this.connectionEstablishedConsumers.add(listenerConsumer);
     }
 
+    public void onConnectionLost(Consumer<Listener> listenerConsumer) {
+        this.connectionLostConsumers.add(listenerConsumer);
+    }
+
     public void onContextCreated(Consumer<Context> contextConsumer) {
         this.contextCreatedConsumers.add(contextConsumer);
     }
@@ -149,7 +154,8 @@ public class Listener extends Thread {
         if(!this.isConnected())return;
 
         this.shouldDisconnect = true;
-
+        this.connectionLostConsumers.forEach(listenerConsumer -> listenerConsumer.accept(this));
+        System.out.println("LOST");
         try {this.socketInputStream.close();}
         catch(Exception e) {;}
 

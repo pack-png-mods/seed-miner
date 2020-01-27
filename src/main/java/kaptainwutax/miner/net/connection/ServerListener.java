@@ -17,6 +17,7 @@ public class ServerListener extends Thread {
     private Map<Integer, Listener> listeners = new HashMap<>();
 
     private List<Consumer<Listener>> connectionEstablishedConsumers = new ArrayList<>();
+    private List<Consumer<Listener>> connectionLostConsumers = new ArrayList<>();
     private List<Consumer<Context>> contextCreatedConsumers = new ArrayList<>();
 
     public ServerListener(int port) {
@@ -41,6 +42,11 @@ public class ServerListener extends Thread {
 
                 this.listeners.put(listener.getListenerId(), listener);
 
+
+                this.listeners.entrySet().stream()
+                        .filter(entry -> !entry.getValue().isConnected())
+                        .forEach(l -> this.connectionLostConsumers.forEach(listenerConsumer -> listenerConsumer.accept(l.getValue())));
+
                 this.listeners = this.listeners.entrySet().stream()
                         .filter(entry -> entry.getValue().isConnected())
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -54,6 +60,10 @@ public class ServerListener extends Thread {
 
     public void onConnectionEstablished(Consumer<Listener> listenerConsumer) {
         this.connectionEstablishedConsumers.add(listenerConsumer);
+    }
+
+    public void onConnectionLost(Consumer<Listener> listenerConsumer) {
+        this.connectionLostConsumers.add(listenerConsumer);
     }
 
     public void onContextCreated(Consumer<Context> contextConsumer) {
