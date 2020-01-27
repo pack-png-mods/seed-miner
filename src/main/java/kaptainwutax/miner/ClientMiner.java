@@ -1,18 +1,25 @@
 package kaptainwutax.miner;
 
 import javafx.application.Application;
-import javafx.scene.Scene;
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import kaptainwutax.miner.gui.Gui;
 import kaptainwutax.miner.net.connection.Listener;
+import kaptainwutax.miner.net.packet.util.PacketRegistry;
+import kaptainwutax.miner.packet.C2SLogin;
+import kaptainwutax.miner.packet.S2CDisconnect;
 
 public class ClientMiner extends Application {
+
+    static {
+        PacketRegistry.registerPacket(S2CDisconnect.class);
+        PacketRegistry.registerPacket(C2SLogin.class);
+    }
 
     private Gui gui = new ClientGui();
     Listener listener = null;
@@ -67,8 +74,16 @@ public class ClientMiner extends Application {
                 if(listener != null && listener.isConnected()) {
                     listener.onConnectionLost(listener1 -> {
                         button.setDisable(false);
-                        status.setText("Connection lost.");
+
+                        Platform.runLater(() -> {
+                            status.setText("Connection lost.");
+                        });
+
                         listener = null;
+                    });
+
+                    listener.onConnectionEstablished(listener1 -> {
+                        listener1.sendPacket(new C2SLogin(username.getText()));
                     });
 
                     button.setDisable(true);

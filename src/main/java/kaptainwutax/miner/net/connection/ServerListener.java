@@ -37,15 +37,12 @@ public class ServerListener extends Thread {
                 Listener listener = new Listener(serverSocket.accept());
                 this.contextCreatedConsumers.forEach(listener::onContextCreated);
                 this.connectionEstablishedConsumers.forEach(listener::onConnectionEstablished);
+                this.connectionLostConsumers.forEach(listener::onConnectionLost);
+
                 listener.setServer(this);
                 listener.start();
 
                 this.listeners.put(listener.getListenerId(), listener);
-
-
-                this.listeners.entrySet().stream()
-                        .filter(entry -> !entry.getValue().isConnected())
-                        .forEach(l -> this.connectionLostConsumers.forEach(listenerConsumer -> listenerConsumer.accept(l.getValue())));
 
                 this.listeners = this.listeners.entrySet().stream()
                         .filter(entry -> entry.getValue().isConnected())
