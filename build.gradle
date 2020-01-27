@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.reflections:reflections:0.9.11"
+    compile 'com.google.code.gson:gson:2.8.5'
+}
