@@ -54,7 +54,7 @@ public class Listener extends Thread {
     }
 
     public Listener(String address, int port) {
-        this.setName("[iBuilders] Listener " + this.getListenerId());
+        this.setName("Listener " + this.getListenerId());
         this.connectionAddress = new NetAddress(address, port);
 
         try {
