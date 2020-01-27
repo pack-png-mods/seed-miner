@@ -12,6 +12,7 @@ import kaptainwutax.miner.gui.Gui;
 import kaptainwutax.miner.net.connection.Listener;
 import kaptainwutax.miner.net.packet.util.PacketRegistry;
 import kaptainwutax.miner.packet.C2SLogin;
+import kaptainwutax.miner.packet.FindSeeds;
 import kaptainwutax.miner.packet.S2CDisconnect;
 
 public class ClientMiner extends Application {
@@ -19,6 +20,7 @@ public class ClientMiner extends Application {
     static {
         PacketRegistry.registerPacket(S2CDisconnect.class);
         PacketRegistry.registerPacket(C2SLogin.class);
+        PacketRegistry.registerPacket(FindSeeds.class);
     }
 
     private Gui gui = new ClientGui();
@@ -103,7 +105,6 @@ public class ClientMiner extends Application {
             pane.getChildren().addAll(username, ip, port, button, status);
 
             this.setOnCloseRequest(event -> {
-                System.out.println("closing");
                 if(listener != null)listener.disconnect();
             });
         }
