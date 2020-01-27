@@ -32,19 +32,27 @@ public class ServerMiner extends Application {
             port = new TextField("Enter port...");
             port.setMaxWidth(200.0D);
             port.setTranslateY(-50.0d);
+            port.setTranslateX(-300.0D);
 
             button = new Button("Host");
+            button.setTranslateX(-300.0D);
 
             button.setOnMouseClicked(event -> {
                 serverListener = new ServerListener(Integer.parseInt(port.getText()));
 
                 if(serverListener.isConnected()) {
                     button.setDisable(true);
+                    serverListener.start();
                 }
             });
 
             pane.getChildren().add(port);
             pane.getChildren().add(button);
+
+            this.setOnCloseRequest(event -> {
+                System.out.println("closing");
+                if(serverListener != null)serverListener.disconnect();
+            });
         }
     }
 
